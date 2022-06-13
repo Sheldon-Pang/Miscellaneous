@@ -24,8 +24,8 @@ balancer* lb; /* variable to store load balancer object */
  * @return Zero.
  */
 int main() {
-    int number_of_requests = 10;
-    int batch_size = 6;
+    int number_of_requests = 100;
+    int batch_size = 21;
 
     //printf("Please input number of requests (users): ");
     //scanf("%d", &number_of_requests);

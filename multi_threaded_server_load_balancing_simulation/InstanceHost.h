@@ -2,8 +2,8 @@
  * Header file definition of functions to simulate a cloud-like server instance
  * host.
  *
- * @author Sheldon Pang
- * @version 1.0
+ * @author Acuna, Sheldon Pang
+ * @version 1.1
  */
 
 #ifndef INSTANCEHOST_H
@@ -11,11 +11,12 @@
 
 #include "LoadBalancer.h"
 
-typedef struct host { /* structure for representing the host */
-    int number_of_instances;    /* track number of instances has spawned */
-}host;
+//struct for representing the host
+typedef struct host host;
 
-struct job_node; /* defined in LoadBalancer */
+struct job_node; //defined in LoadBalancer
+
+//forward declarations for (public) functions
 
 /**
 * Initializes the host environment.
@@ -26,7 +27,7 @@ host* host_create();
 * Shuts down the host environment. Ensures any outstanding batches have
 * completed.
 */
-void host_destroy(host** host);
+void host_destroy(host**);
 
 /**
 * Creates a new server instance (i.e., thread) to handle processing the items
@@ -37,6 +38,5 @@ void host_destroy(host** host);
 * @param job_batch_list A list containing the jobs in a batch to process.
 */
 void host_request_instance(host* h, struct job_node* batch);
-
 
 #endif

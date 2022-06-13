@@ -7,14 +7,24 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+#include <pthread.h>
 #include "InstanceHost.h"
+
+struct host {
+    pthread_t* th;
+};
+
+pthread_mutex_t list_lock; /* mutex lock */
+pthread_t th[100];
+int instance_id = 0;
+
+void* runner_computation(void* nodeHead);
 
 /**
 * Initializes the host environment.
 */
 host* host_create() {
-    host* host = (struct host*)malloc(sizeof(host));
+    host* host = (struct host*)malloc(sizeof(struct host));
     return host;
 }
 
@@ -23,6 +33,8 @@ host* host_create() {
 * completed.
 */
 void host_destroy(host** host) {
+    /* any outstanding batches is handled in balancer_destroy */
+
     free(*host);
     *host = NULL;
 }
@@ -37,9 +49,30 @@ void host_destroy(host** host) {
 */
 void host_request_instance(host* h, struct job_node* batch) {
     printf("LoadBalancer: Received batch and spinning up new instance.\n");
-    while(batch != NULL) {
-        *batch->data_result = batch->data * batch->data;
-        batch = batch->next;
+
+    if (pthread_create(&th[instance_id], NULL, &runner_computation, (void*)batch) != 0)
+        perror("Failed to create thread");
+    if (pthread_join(th[instance_id], NULL) != 0)
+        perror("Failed to join thread");
+
+    instance_id++;
+}
+
+/**
+* Pthread runner function used to calculate the squares of a number
+*/
+void* runner_computation(void* nodeHead) {
+    pthread_mutex_init(&list_lock, NULL);       /* initialize mutex to prevent race condition */
+    pthread_mutex_lock(&list_lock);             /* Critical Section */
+
+    while(nodeHead != NULL) {
+        /* cast void type to struct job_node* and loop nodes and compute squares */
+        *((struct job_node*)nodeHead)->data_result = ((struct job_node*)nodeHead)->data * ((struct job_node*)nodeHead)->data;
+        nodeHead = ((struct job_node*)nodeHead)->next;
     }
-    h->number_of_instances--; /* finished and decrement number of instances */
+
+    pthread_mutex_unlock(&list_lock);           /* Critical Section */
+    pthread_mutex_destroy(&list_lock);          /* mutex destroy */
+
+    pthread_exit(0);
 }

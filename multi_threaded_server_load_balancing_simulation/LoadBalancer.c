@@ -12,7 +12,11 @@
 #include "InstanceHost.h"
 
 struct job_node* list_head = NULL;
-pthread_mutex_t list_lock;
+pthread_mutex_t list_lock;  /* mutex lock */
+
+/* global variable for batch size and number of request */
+int batch_size_global = 0;
+int number_of_requests_global = 0;
 
 /* initialize Instance Host */
 host* h;
@@ -21,15 +25,11 @@ host* h;
  * Initializes the load balancer. Takes batch size as parameter.
  */
 balancer* balancer_create(int batch_size) {
-    balancer* bl = (balancer*)malloc(sizeof(balancer));
-    //bl->head = (struct job_node*)malloc(sizeof(struct job_node) * batch_size);
-    bl->number_of_requests = 0;
-    bl->batch_size = batch_size;
-    //bl->head = NULL;
+    balancer* bl = (balancer*)malloc(sizeof(int));
+    batch_size_global = batch_size;
 
     /* initialize Instance Host */
     h = host_create();
-    h->number_of_instances = 0;
 
     return bl;
 }
@@ -78,23 +78,22 @@ void balancer_add_job(balancer* lb, int user_id, int data, int* data_return) {
     jobNode->next = list_head;
     list_head = jobNode;
 
-    lb->number_of_requests++; /* increment number_of_requests when a new job is added */
+    number_of_requests_global++; /* increment number_of_requests when a new job is added */
 
-    if (lb->number_of_requests == lb->batch_size) { /* execute when requests reach batch_size set by user */
+    if (number_of_requests_global == batch_size_global) { /* execute when requests reach batch_size set by user */
 
         /* delete the batch from the list */
         struct job_node* tempNode; /* a temp node to store the pointer to list head */
         tempNode = list_head;      /* use tempNode pointer in host_request_instance */
-        int i = lb->batch_size;
+        int i = batch_size_global;
         while (i != 0) { /* loop and delete front node based on batch_size */
             list_head = list_head->next;
             i--;
         }
-        lb->number_of_requests = lb->number_of_requests - lb->batch_size;
+        number_of_requests_global = number_of_requests_global - batch_size_global;
 
         /* call host_request_instance */
         host_request_instance(h, tempNode);
-        h->number_of_instances++; /* increment number of instances running */
     }
 
     pthread_mutex_unlock(&list_lock);           /* Critical Section */
