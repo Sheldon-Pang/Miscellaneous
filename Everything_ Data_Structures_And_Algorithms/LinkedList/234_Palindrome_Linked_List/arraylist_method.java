@@ -9,6 +9,7 @@
  * }
  */
 /* Copying Linked list into an array, then check for palindrome */
+/* Time: O(n), Space: O(n) */
 class Solution {
     public boolean isPalindrome(ListNode head) {
 
