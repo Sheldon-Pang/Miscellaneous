@@ -1,4 +1,4 @@
-/* iterative method, Time: O(M) number of cells, O(1) */
+/* iterative method, Time: O(M) number of cells, Space: O(1) */
 class Solution {
     public void rotate(int[][] matrix) {
         int n = matrix.length;
