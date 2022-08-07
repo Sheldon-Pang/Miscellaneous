@@ -1,3 +1,6 @@
+/* Time: O(n), Space: O(n) */
+/* Using HashMap is not ideal when the input area is sorted
+* Use Two Pointer method instead */
 class Solution {
     public int[] twoSum(int[] numbers, int target) {
 
