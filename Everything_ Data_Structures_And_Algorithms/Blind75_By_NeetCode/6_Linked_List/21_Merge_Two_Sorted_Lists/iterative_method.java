@@ -17,7 +17,7 @@ class Solution {
         /* Pesudo head node */
         ListNode pesudoHead = new ListNode(-1);
 
-        /* Prev node to track */
+        /* Prev node to track the lastly connected node */
         ListNode prev = pesudoHead;
 
         /* Merge two list */
@@ -29,6 +29,7 @@ class Solution {
                 prev.next = list2;
                 list2 = list2.next;
             }
+            /* prev become the recently connected node */
             prev = prev.next;
         }
 
