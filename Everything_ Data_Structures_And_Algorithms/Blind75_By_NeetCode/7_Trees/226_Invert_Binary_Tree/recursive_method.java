@@ -14,20 +14,28 @@
  * }
  */
 
-/* recursive method, Time: O(n), Space: O(n) */
+/*
+                    4
+                 /      \
+                2          7    left=2, right=7, left becomes 7, and right becomes 2
+            /     \      /   \
+           1       3    6     9  same for this layer as well
+
+           Time: O(n)
+           Space: O(h)
+
+*/
+
+
 class Solution {
     public TreeNode invertTree(TreeNode root) {
-
         if (root == null) {
-            return null;
+            return root;
         }
-
-        TreeNode right = invertTree(root.right);
         TreeNode left = invertTree(root.left);
-
+        TreeNode right = invertTree(root.right);
         root.left = right;
         root.right = left;
-
         return root;
     }
 }
