@@ -21,3 +21,38 @@ class Solution {
         return dp[n];
     }
 }
+
+
+/*
+
+Input: n = 3
+Output: 3
+
+n = 1, 1
+n = 2, 2
+n = 3, 3
+n = 4, 5
+
+tabulation apporach
+n = (n - 1) + (n - 2)
+
+Time: O(N)
+Space: O(N)
+
+*/
+
+class Solution {
+    public int climbStairs(int n) {
+
+        int[] tabulation = new int[n + 1];
+
+        tabulation[0] = 1;
+        tabulation[1] = 2;
+
+        for (int i = 2; i < n; i++) {
+            tabulation[i] = tabulation[i - 1] + tabulation[i - 2];
+        }
+
+        return tabulation[n - 1];
+    }
+}
